@@ -16,11 +16,12 @@ namespace ConsolePrj
             MesTests mesTests = oServicesProvider.GetService<MesTests>();
 
             //- Liste des Passagers et de leur Vol
-            mesTests.TestJoin_Passagers_AvecLeurVol();
+            mesTests.Test_Passagers_AvecLeurVol_via_Select_et_Where();
+            mesTests.Test_Passagers_AvecLeurVol_via_Join();
 
             //- Liste des Vols avec leurs Passagers
-            mesTests.TestJoin_Vols_AvecLeursPassagers_Avec_GroupBy_Select();
-            mesTests.TestGroupJoin_Vols_AvecLeursPassagers();
+            mesTests.Test_Vols_AvecLeursPassagers_via_Select_et_Where();
+            mesTests.Test_Vols_AvecLeursPassagers_via_GroupJoin();
 
             Console.WriteLine("\n\nOk"); Console.ReadKey();
         }
