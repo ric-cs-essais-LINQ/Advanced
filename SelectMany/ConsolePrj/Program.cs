@@ -70,18 +70,47 @@ namespace zzzzzTestsRapides
             //--- REM.: l'utilisation d'un Select ou SelectMany, s'appelle une Projection ---
             //-------------------------------------------------------------------------------
             Console.WriteLine("\n---- Liste des livres mais par Biblio ----\n\n"); Console.ReadKey();
-            var bibliosLivres = biblios.Select(b => b.Livres); //<<<<<<<<<< On obtient quand même une Liste de Biblio, (mais avec uniquement 1 propriété "Livres" pour chacune)
+            var bibliosLivres = biblios.Select(b => b.Livres); //<<<<<<<<<< On obtient une Liste dont chaque élément(1 par biblio.), est une Collection<Livre>.
             Debug.ShowData(bibliosLivres);
             Console.WriteLine("\n\n"); Console.ReadKey();
 
             //---------------------------------------------
             Console.WriteLine("\n---- Liste des livres A PLAT !! (de toutes les Biblios) . (Liste triée par Titre) ----\n\n"); Console.ReadKey();
-            var livres = biblios.SelectMany(b => b.Livres).OrderBy(livre => livre.Titre); //<<<<<<<<< Cette fois, on obtient directement une Liste de Livre !! grâce au SelectMany.
+            var livres = biblios.SelectMany(b => b.Livres).OrderBy(livre => livre.Titre); //<<<<<<<<< Cette fois, on obtient directement une Liste de Livre à plat!! grâce au SelectMany.
             Debug.ShowData(livres);
             Console.WriteLine("\n\n"); Console.ReadKey();
 
+
+            //---------------------------------------------
+            Console.WriteLine("\n---- Liste des livres A PLAT !! Pour la Biblio2 ----\n\n"); Console.ReadKey();
+            var livresBiblio2 = biblios.Where(biblio => biblio.Nom.Contains("numberTwo")).SelectMany(b => b.Livres); //<<<<<<<<< on obtient directement une Liste de Livre à plat!! grâce au SelectMany.
+            Debug.ShowData(livresBiblio2);
+            Console.WriteLine("\n\n"); Console.ReadKey();
+
+
+
+
+            //--------------- Autre syntaxe d'utilisation de SelectMany ------------------------------
+            Console.WriteLine("\n---- Autre syntaxe d'utilisation de SelectMany : liste des livres par biblio. ----\n\n"); Console.ReadKey();
+            var livresParBiblio = biblios.SelectMany(b => b.Livres, (biblio, livre) => //appelée pour Chaque livre de Chaque biblio !!
+            {
+                //donc appelée pour CHAQUE livre de la Biblio. biblio ! (chaque biblio. étant passée en revue)
+                return new { NomBiblio = biblio.Nom, TitreNiemeLivre = livre.Titre };
+            }) //<<Ici on a une liste d'objets de la forme : { NomBiblio = ..., TitreNiemeLivre = ... }
+            .GroupBy(biblioLivre => biblioLivre.NomBiblio)  //<<On regroupe par même nom de biblio., on a donc là un tableau donc chaque élément(1 par biblio)
+                                                            // est un tableau d'éléments de le forme : { NomBiblio = ..., TitreNiemeLivre = ... }
+            .Select(tableauBiblioLivres => new
+            {
+                biblioName = tableauBiblioLivres.ElementAt(0).NomBiblio,//Le même pour chaque élément du tableau tableauBiblioLivres.
+                titresLivres = tableauBiblioLivres.Select(biblioLivre => biblioLivre.TitreNiemeLivre)
+            });
+            Debug.ShowData(livresParBiblio);
+            Console.WriteLine("\n\n"); Console.ReadKey();
+
+
             //----------------------------------------------
-            Console.WriteLine("\n\nOK");  Console.ReadKey();
+            Console.WriteLine("\n\nOK"); Console.ReadKey();
         }
+
     }
 }
